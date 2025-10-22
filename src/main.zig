@@ -3,12 +3,14 @@ const std = @import("std");
 pub fn main() !void {
     var buf: [1]u8 = undefined;
     try std.posix.getrandom(&buf);
-    var outb = std.io.bufferedWriter(std.io.getStdOut().writer());
-    const out = outb.writer();
+
+    var out_buf: [1024]u8 = undefined;
+    var out_writer = std.fs.File.stdout().writer(&out_buf);
+    const out = &out_writer.interface;
 
     try out.writeAll(greets[buf[0] % greets.len]);
     try out.writeByte('\n');
-    try outb.flush();
+    try out.flush();
 }
 
 const greets = [_][]const u8{
